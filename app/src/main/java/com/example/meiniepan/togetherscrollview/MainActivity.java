@@ -21,7 +21,7 @@ import java.util.List;
  * create by Solang on 2018/4/12
  * i love YuanJiao && WangYouRan
  */
-public class MainActivity extends AppCompatActivity implements ScrollViewListener{
+public class MainActivity extends AppCompatActivity implements ScrollViewListener {
     WalletHeadRecyclerView rvHead;
     WalletFootRecyclerView rvFoot;
     private WalletHeaderAdapter adapter;
@@ -42,13 +42,14 @@ public class MainActivity extends AppCompatActivity implements ScrollViewListene
         initRvHead();
         initRvFoot();
     }
+
     private void initRvHead() {
         List list = new ArrayList();
         list.add("2");
         list.add("3");
         list.add("4");
 
-        adapter = new WalletHeaderAdapter(R.layout.item_wallet_header,list);
+        adapter = new WalletHeaderAdapter(R.layout.item_wallet_header, list);
         rvHead.setAdapter(adapter);
         initHeadFoot();
     }
@@ -62,6 +63,10 @@ public class MainActivity extends AppCompatActivity implements ScrollViewListene
         adapterFoot.setData(list);
         rvFoot.setAdapter(adapterFoot);
     }
+
+    /**
+     * 为上面的recyclerView添加头布局和尾布局
+     */
     private void initHeadFoot() {
         View head = LayoutInflater.from(this).inflate(R.layout.wallet_header_foot, rvHead, false);
         View foot = LayoutInflater.from(this).inflate(R.layout.wallet_header_foot, rvHead, false);
@@ -77,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements ScrollViewListene
         foot.setLayoutParams(params1);
         adapter.addFooterView(foot, 0, 0);
     }
+
     @Override
     public void onScrollChanged(Object scrollView, int x, int y) {
         int width1 = CommonUtil.getScreenWidth(this) - DensityUtils.dip2px(this, 60);

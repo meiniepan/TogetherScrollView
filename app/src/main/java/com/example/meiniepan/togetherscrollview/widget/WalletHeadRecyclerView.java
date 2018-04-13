@@ -23,7 +23,7 @@ public class WalletHeadRecyclerView extends RecyclerView {
     private OnSelectListener mOnSelectListener;
     private int mSelected = -1;
     private ScrollViewListener scrollViewListener;
-    private int sx =0;
+    private int sx = 0;
     private boolean isMark = true;
 
     public WalletHeadRecyclerView(Context context) {
@@ -53,14 +53,16 @@ public class WalletHeadRecyclerView extends RecyclerView {
 
     @Override
     public boolean fling(int velocityX, int velocityY) {
-        int v;
-        int touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
-        Log.e("=========","x "+velocityX+" s "+touchSlop);
-        if (Math.abs(velocityX) <= 3*touchSlop) return false;
+        //滑动系数
         mPhysicalCoeff = SensorManager.GRAVITY_EARTH   // g (m/s^2)
                 * 39.37f               // inch/meter
                 * getContext().getResources().getDisplayMetrics().density * 160.0f                 // pixels per inch
                 * 0.84f;
+
+        int v;
+        int touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
+        Log.e("=========", "x " + velocityX + " s " + touchSlop);
+        if (Math.abs(velocityX) <= 3 * touchSlop) return false;//速率太低直接返回，过滤无效fling
         int firstVisiblePos = mLayoutManager.findFirstVisibleItemPosition();
         if (firstVisiblePos == RecyclerView.NO_POSITION) {
             return false;
@@ -69,10 +71,11 @@ public class WalletHeadRecyclerView extends RecyclerView {
         mLayoutManager.findViewByPosition(firstVisiblePos).getHitRect(rect);
         double n = getSplineFlingDistance(velocityX) / mItemWidth;
         int num = Double.valueOf(n).intValue();
+        //把double转化为int,通过整数num求出恰好滑动整数个item的初始速率
         if (velocityX > 0)
-            v = Double.valueOf(getVelocityByDistance(num * mItemWidth + Math.abs(rect.right)- DensityUtils.dip2px(getContext(), 20))).intValue();
+            v = Double.valueOf(getVelocityByDistance(num * mItemWidth + Math.abs(rect.right) - DensityUtils.dip2px(getContext(), 20))).intValue();
         else
-            v = Double.valueOf(getVelocityByDistance(num * mItemWidth + Math.abs(rect.left)+ DensityUtils.dip2px(getContext(), 20))).intValue();
+            v = Double.valueOf(getVelocityByDistance(num * mItemWidth + Math.abs(rect.left) + DensityUtils.dip2px(getContext(), 20))).intValue();
         if (velocityX < 0) v = -v;
         return super.fling(v, velocityY);
     }
@@ -117,16 +120,15 @@ public class WalletHeadRecyclerView extends RecyclerView {
     @Override
     public void onScrolled(int dx, int dy) {
         super.onScrolled(dx, dy);
-        sx = sx +dx;
-        if (scrollViewListener != null && isMark) {
+        sx = sx + dx;
+        if (scrollViewListener != null && isMark) {//isMark防止无限嵌套滑动
             scrollViewListener.onScrollChanged(this, sx, 0);
         }
     }
 
     @Override
     public void scrollTo(int x, int y) {
-//        super.scrollTo(x, y);
-        scrollBy(x-sx,0);
+        scrollBy(x - sx, 0);
     }
 
     public void setmark(boolean b) {
@@ -147,8 +149,8 @@ public class WalletHeadRecyclerView extends RecyclerView {
                 }
                 Rect rect = new Rect();
                 mLayoutManager.findViewByPosition(firstVisiblePos).getHitRect(rect);
-                Log.e("left1",rect.left+"");
-                if (rect.left == 0)return;
+                Log.e("left1", rect.left + "");
+                if (rect.left == 0) return;
                 if (Math.abs(rect.left) > mItemWidth / 2) {
                     smoothScrollBy(rect.right - DensityUtils.dip2px(getContext(), 20), 0);
                     mmSelected = firstVisiblePos + 1;
@@ -156,6 +158,7 @@ public class WalletHeadRecyclerView extends RecyclerView {
                     smoothScrollBy(rect.left - DensityUtils.dip2px(getContext(), 20), 0);
                     mmSelected = firstVisiblePos;
                 }
+                //回弹结束后的回调
                 if (Math.abs(rect.left) == 0 && mOnSelectListener != null && mmSelected != mSelected) {
                     mSelected = mmSelected;
                     mOnSelectListener.onSelect(mSelected);
